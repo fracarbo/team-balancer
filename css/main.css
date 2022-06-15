@@ -1,0 +1,29 @@
+@import url('/css/bootstrap.min.css');
+
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins&family=Teko&display=swap');
+
+/* Icons */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
+
+/* Variables */
+* {
+    --main-color: #0C4A08;
+}
+
+/* Styles */
+body { font-family: 'Poppins', sans-serif!important;}
+/*h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+}*/
+
+.primary {
+    color: white;
+    background-color: var(--main-color);
+}
+
+.secondary {
+    color: black;
+    background-color: white;
+    border: solid 1px var(--main-color);
+}
