@@ -1,2 +1,4 @@
 Aggiungere le mie info personali
 Inserire favicon
+Restyling
+Nuovo algoritmo?
