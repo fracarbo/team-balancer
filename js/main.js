@@ -1,8 +1,4 @@
-
-String.prototype.toTitle = function() {
-  return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-}
-
+import toTitle from "./utils.js";
 import balanceTeams from "./balancer.js";
 
 const { createApp } = Vue
@@ -12,7 +8,8 @@ createApp({
     return {
       newPlayer: {
         name: '',
-        value: 5
+        value: 5,
+        selected: true
       },
       players: JSON.parse(localStorage.getItem('players')) ?? []
     }
@@ -20,10 +17,11 @@ createApp({
   methods: {
     addPlayer () {
       const newPlayer = {
-        name: this.newPlayer.name.toTitle(),
+        name: toTitle(this.newPlayer.name),
         value: this.newPlayer.value,
         selected: true
       }
+
       const playerExists = this.players.find(p => p.name === newPlayer.name)
       
       if (playerExists) return alert("Player already exists!")
@@ -48,8 +46,11 @@ createApp({
     }
   },
   watch: {
-    players() {
-      localStorage.setItem('players', JSON.stringify(this.players))
+    players: {
+      handler() {
+        localStorage.setItem('players', JSON.stringify(this.players))
+      },
+      deep: true
     }
   },
   computed: {
