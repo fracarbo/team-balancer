@@ -8,6 +8,9 @@
   <title>Team balancer</title>
   <script src="https://unpkg.com/vue@3"></script>
   <link rel="stylesheet" href="./css/main.css">
+  <!-- Lodash -->
+  <script src="https://unpkg.com/lodash"></script>
+  <script src="https://unpkg.com/lodash.combinations"></script>
 </head>
 <body>
   <div id="app" class="container mt-2">
@@ -23,36 +26,40 @@
             </div>
             <div class="col-sm-2">
               <label class="form-label">Value: {{ newPlayer.value }}</label>
-              <input v-model="newPlayer.value" type="range" class="form-range" min="1" max="10">
+              <input v-model.number="newPlayer.value" type="range" class="form-range" min="1" max="10">
             </div>
           </div>
           <div class="d-grid gap-2">
-            <button class="btn btn-success"><i class="fa fa-plus"></i> Add player</button>    
+            <button class="btn btn-outline-success"><i class="fa fa-plus"></i> Add player</button>    
           </div>
         </form>
       </div>
     </section>
-    <div v-if="players.length > 0">
-      <section class="mb-4 card">
-        <div class="card-body">
-          <h2 class="card-title">Players list</h2>
-          <div class="list-group list-group-flush">
-            <label v-for="player in players" :key="player.name" class="list-group-item">
-              <input type="checkbox" v-model="player.selected" class="form-check-input me-1">
-              {{ player.name }}
-              <span class="badge bg-success rounded-pill">{{ player.value }}</span>
-              <button @click="removePlayer(player)" class="btn btn-outline-danger btn-sm float-end"><i class="fa fa-trash"></i> Delete</button>
-            </label>
-          </div>
+    <section v-if="players.length > 0" class="mb-4 card">
+      <div class="card-body">
+        <h2 class="card-title">Players list</h2>
+        <div class="list-group list-group-flush">
+          <label v-for="player in players" :key="player.name" class="list-group-item">
+            <input type="checkbox" v-model="player.selected" class="form-check-input me-1">
+            {{ player.name }}
+            <span class="badge bg-success rounded-pill">{{ player.value }}</span>
+            <button @click="removePlayer(player)" class="btn btn-outline-danger btn-sm float-end"><i class="fa fa-trash"></i></button>
+          </label>
         </div>
-      </section>
-      <section class="row mb-4">
+        <div class="d-grid gap-2">
+          <a @click="getBalancedTeams" href="#balancedTeams" class="btn btn-success" :disabled="selectedPlayers.length <= 1">Balance</a>
+        </div>
+      </div>
+    </section>
+    <p v-else> Add some player </p>
+    <div v-if="balancedTeams.length > 0">
+      <section class="row mb-4" id="balancedTeams">
         <div class="col-sm-6 mb-2">
           <div class="card">
             <div class="card-body">
-              <h3 class="card-title">Team A <span class="badge bg-success rounded-pill float-end">{{teamValues[0]}}</span></h3>
+              <h3 class="card-title">Team A <span class="badge bg-success rounded-pill float-end">{{ balancedTeams[0].value }}</span></h3>
               <ol class="list-group list-group-numbered list-group-flush">
-                <li v-for="player in balancedTeams[0]" class="list-group-item">
+                <li v-for="player in balancedTeams[0].players" class="list-group-item">
                   {{player.name}}
                 </li>
               </ol>
@@ -62,9 +69,9 @@
         <div class="col-sm-6">
           <div class="card">
             <div class="card-body">
-              <h3 class="card-title">Team B <span class="badge bg-success rounded-pill float-end">{{teamValues[1]}}</span></h3>
+              <h3 class="card-title">Team B <span class="badge bg-success rounded-pill float-end">{{ balancedTeams[1].value }}</span></h3>
               <ol class="list-group list-group-numbered list-group-flush">
-                <li v-for="player in balancedTeams[1]" class="list-group-item">
+                <li v-for="player in balancedTeams[1].players" class="list-group-item">
                   {{player.name}}
                 </li>
               </ol>
@@ -74,7 +81,6 @@
       </section>
       <button @click="shareTeams" class="btn btn-outline-success"><div class="fa fa-share"></div> Share teams</button>
     </div>
-    <p v-else> Add some player </p>
   </div>
   <script src="./js/main.js" type="module"></script>
 </body>

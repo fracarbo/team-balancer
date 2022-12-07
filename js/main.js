@@ -1,5 +1,6 @@
 import toTitle from "./utils.js";
 import balanceTeams from "./balancer.js";
+import balanceTeamsSuggestions from "./balancer2.js";
 
 const { createApp } = Vue
 
@@ -11,7 +12,8 @@ createApp({
         value: 5,
         selected: true
       },
-      players: JSON.parse(localStorage.getItem('players')) ?? []
+      players: JSON.parse(localStorage.getItem('players')) ?? [],
+      balancedTeams: []
     }
   },
   methods: {
@@ -43,6 +45,9 @@ createApp({
         url: window.location.url,
         text: text
       })
+    },
+    getBalancedTeams() {
+      this.balancedTeams = balanceTeamsSuggestions(this.selectedPlayers)[0]
     }
   },
   watch: {
@@ -56,12 +61,6 @@ createApp({
   computed: {
     selectedPlayers() { 
       return this.players.filter(p => p.selected)
-    },
-    balancedTeams() {
-      return balanceTeams(this.selectedPlayers)
-    },
-    teamValues() { 
-      return this.balancedTeams.map(team => team.reduce((acc, player) => acc + player.value, 0))
     }
   }
 }).mount('#app')
