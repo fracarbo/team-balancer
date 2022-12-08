@@ -13,74 +13,106 @@
   <script src="https://unpkg.com/lodash.combinations"></script>
 </head>
 <body>
-  <div id="app" class="container mt-2">
-    <h1><strong>Team Balancer</strong></h1>
+  <nav class="navbar navbar-dark bg-success">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Team Balancer</span>
+      <span class="text-light">v2.0.0</span>
+    </div>
+  </nav>
+  <div id="app" class="container mt-4">
+    <!-- New player form -->
     <section class="mb-4 card">
       <div class="card-body">
-        <h2 class="card-title">New player</h2>
+        <h3 class="card-title">New player</h3>
         <form @submit.prevent="addPlayer">
           <div class="row mb-2">
             <div class="col">
               <label>Name</label>
-              <input v-model="newPlayer.name" class="form-control" placeholder="Cristiano Ronaldo" required>
+              <input
+                id="newPlayerNameField"
+                v-model="newPlayer.name"
+                class="form-control mb-2"
+                placeholder="Cristiano Ronaldo" 
+                required
+              >
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-6">
               <label class="form-label">Value: {{ newPlayer.value }}</label>
               <input v-model.number="newPlayer.value" type="range" class="form-range" min="1" max="10">
             </div>
           </div>
           <div class="d-grid gap-2">
-            <button class="btn btn-outline-success"><i class="fa fa-plus"></i> Add player</button>    
+            <button class="btn btn-outline-primary"><i class="fa fa-plus"></i> Add player</button>    
           </div>
         </form>
       </div>
     </section>
-    <section v-if="players.length > 0" class="mb-4 card">
-      <div class="card-body">
-        <h2 class="card-title">Players list</h2>
-        <div class="list-group list-group-flush">
-          <label v-for="player in players" :key="player.name" class="list-group-item">
-            <input type="checkbox" v-model="player.selected" class="form-check-input me-1">
-            {{ player.name }}
-            <span class="badge bg-success rounded-pill">{{ player.value }}</span>
-            <button @click="removePlayer(player)" class="btn btn-outline-danger btn-sm float-end"><i class="fa fa-trash"></i></button>
-          </label>
-        </div>
-        <div class="d-grid gap-2">
-          <a @click="getBalancedTeams" href="#balancedTeams" class="btn btn-success" :disabled="selectedPlayers.length <= 1">Balance</a>
+
+    <!-- Players list -->
+    <section>
+      <div v-if="players.length > 0" class="mb-4 card">
+        <div class="card-body">
+          <h3 class="card-title mb-4">Players list</h3>
+          <span>Selected: {{ selectedPlayers.length }}</span>
+          <div class="list-group list-group-flush mb-4">
+            <label v-for="player in players" :key="player.name" class="list-group-item">
+              <input type="checkbox" v-model="player.selected" class="form-check-input me-1">
+              {{ player.name }}
+              <span class="badge bg-success rounded-pill">{{ player.value }}</span>
+              <button @click="removePlayer(player)" class="btn btn-light btn-sm float-end"><i class="fa fa-trash"></i></button>
+            </label>
+          </div>
+          <div class="d-grid gap-2">
+            <button
+              :disabled="selectedPlayers.length < 3"
+              @click="viewBalancedTeams"
+              class="btn btn-success btn-lg"
+              >Balance
+            </button>
+          </div>
         </div>
       </div>
+      <p v-else> Add some player </p>
     </section>
-    <p v-else> Add some player </p>
-    <div v-if="balancedTeams.length > 0">
-      <section class="row mb-4" id="balancedTeams">
-        <div class="col-sm-6 mb-2">
+    <!-- Balanced teams-->
+    <section v-if="balancedTeams.length > 0">
+      <h3>Team suggestions</h3>
+      <section class="scrolling-wrapper row flex-nowrap mb-4" id="balancedTeams">
+        <div v-for="suggestion in balancedTeams" class="pr-2 suggestion-card">
           <div class="card">
             <div class="card-body">
-              <h3 class="card-title">Team A <span class="badge bg-success rounded-pill float-end">{{ balancedTeams[0].value }}</span></h3>
-              <ol class="list-group list-group-numbered list-group-flush">
-                <li v-for="player in balancedTeams[0].players" class="list-group-item">
-                  {{player.name}}
-                </li>
-              </ol>
-            </div>
+              <div class="row">
+                <div class="col-6">
+                  <span class="badge bg-success rounded-pill float-start">{{ suggestion[0].value }}</span>
+                  <ul class="list-group list-group-flush">
+                    <li v-for="player in suggestion[0].players" class="list-group-item">
+                      {{player.name}}
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-6">
+                  <span class="badge bg-success rounded-pill float-end">{{ suggestion[1].value }}</span>
+                  <ul class="list-group list-group-flush">
+                    <li v-for="player in suggestion[1].players" class="list-group-item">
+                      {{player.name}}
+                    </li>
+                  </ul>
+                </div>
+              </div>   
+              <div class="d-grid gap-2 mt-4">
+                <button
+                  @click="shareTeams(suggestion)"
+                  class="btn btn-outline-success btn-sm float-end"
+                >
+                  <i class="fa fa-share"></i>
+                  Condividi
+                </button>
+              </div>       
+            </div> 
           </div>
-        </div>
-        <div class="col-sm-6">
-          <div class="card">
-            <div class="card-body">
-              <h3 class="card-title">Team B <span class="badge bg-success rounded-pill float-end">{{ balancedTeams[1].value }}</span></h3>
-              <ol class="list-group list-group-numbered list-group-flush">
-                <li v-for="player in balancedTeams[1].players" class="list-group-item">
-                  {{player.name}}
-                </li>
-              </ol>
-            </div>
-          </div>
-        </div>  
+        </div> 
       </section>
-      <button @click="shareTeams" class="btn btn-outline-success"><div class="fa fa-share"></div> Share teams</button>
-    </div>
+    </section>
   </div>
   <script src="./js/main.js" type="module"></script>
 </body>

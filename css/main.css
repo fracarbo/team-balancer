@@ -20,3 +20,11 @@ body { font-family: 'Poppins', sans-serif!important; }
   background-color: white;
   border: solid 1px var(--main-color);
 }
+
+.scrolling-wrapper{
+	overflow-x: auto;
+}
+
+.suggestion-card {
+  width: 500px!important;
+}

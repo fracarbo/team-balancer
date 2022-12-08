@@ -1,38 +1,38 @@
 /*
-  1)  a, b = []
-  2)  m = (somma di tutti i value / 2)
-  3)  k = lunghezza list / 2
-  4)  per i da 0 a k
-  5)      se i è pari
-  6)          aSum = somma dei value di a
-  7)          accettableMaxes = {x app. list: x + aSum <= m}
-  8)          max = max di accettableMaxes
-  9)          aggiungi max ad a
-  10)         rimuovi max da list
-  11)     altrimenti
-  12)         min = min di list
-  13)         aggiungi min ad a
-  14)         rimuovi min da list
-  15) b = list
-  16) return a, b
+m = (somma di tutti i value / 2)
+k = lunghezza playersList / 2
+combinations = tutte le combinazioni di di k = floor(n/2) elementi su una playersLista di n elementi
+per ogni combinazione
+  s = somma dei valori dei singoli giocatori
+  d = |m - s|
+ordino le combinations secondo d in ordine crescente
+mi prendo solo i primi n risultati
 */
-export default function balanceTeams(list) {
-  let a = [], b = []
-  const m = list.map(item => item.value).reduce((prev, curr) => prev + curr, 0)
-  const k = list.length / 2
-  for(let i = 0; i < k; i=i+1){
-    if(i%2 === 0){
-      let aSum = a.map(item => item.value).reduce((prev, curr) => prev + curr, 0)
-      let accettableMaxes = list.filter(x => x.value + aSum <= m)
-      let max = list.filter(x => x.value == Math.max(...accettableMaxes.map(item => item.value)))[0]
-      a.push(max)
-      list = list.filter(item => item.name !== max.name)       
-    } else {
-        let min = list.filter(x => x.value === Math.min(...list.map(item => item.value)))[0]
-        a.push(min)
-        list = list.filter(item => item.name !== min.name)
-    }
+
+const teamValue = team => team.reduce((sum, player) => sum + player.value, 0)
+
+const otherTeam = (team, playersList) => {
+  const teamPlayersNames = new Set(team.map(p => p.name))
+  const otherTeam = playersList.filter(p => !teamPlayersNames.has(p.name))
+  return otherTeam
+}
+
+const formatTeam = team => {
+  return {
+    players: team,
+    value: teamValue(team)
   }
-  b = list
-  return [a, b]
+}
+
+export default function balanceTeamsSuggestions(playersList, nOfResults) {
+  const m = playersList.reduce((sum, player) => sum + player.value, 0) / 2
+  const k = Math.floor(playersList.length / 2)
+  let possibleTeams = _.combinations(playersList, k)
+  possibleTeams.forEach(team => {
+    team.value = teamValue(team)
+    team.delta = Math.abs(team.value - m)
+  });
+  possibleTeams = _.orderBy(possibleTeams, "delta").slice(0, nOfResults)
+  const teamCouples = possibleTeams.map(team => [formatTeam(team), formatTeam(otherTeam(team, playersList))])
+  return teamCouples
 }
