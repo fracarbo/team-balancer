@@ -1,5 +1,0 @@
-Aggiungere le mie info personali
-Inserire favicon
-Restyling
-Composition API
-Nuovo algoritmo?
